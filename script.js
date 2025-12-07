@@ -163,36 +163,35 @@ async function initGame() {
 }
 
 function showNoStoryUI() {
-    // Create overlay if not exists
-    let overlay = document.getElementById('no-story-overlay');
-    if (!overlay) {
-        overlay = document.createElement('div');
-        overlay.id = 'no-story-overlay';
-        overlay.style.position = 'fixed';
-        overlay.style.top = '0';
-        overlay.style.left = '0';
-        overlay.style.width = '100%';
-        overlay.style.height = '100%';
-        overlay.style.backgroundColor = 'rgba(0,0,0,0.9)';
-        overlay.style.zIndex = '9999';
-        overlay.style.display = 'flex';
-        overlay.style.flexDirection = 'column';
-        overlay.style.justifyContent = 'center';
-        overlay.style.alignItems = 'center';
-        overlay.style.color = 'white';
-        overlay.style.textAlign = 'center';
-
-        overlay.innerHTML = `
-            <h1>No Story Found</h1>
+    // Hide game elements
+    sceneImageContainer.classList.add('hidden');
+    inputArea.classList.add('hidden');
+    choicesElement.innerHTML = '';
+    storyTextElement.classList.remove('hidden');
+    
+    // Clear and set story text
+    storyTextElement.innerHTML = `
+        <div style="text-align: center; margin-top: 50px;">
+            <h1 style="color: #666;">No Story Selected</h1>
             <p>Please import a story file to begin playing.</p>
-            <button id="overlay-import-btn" class="choice-btn" style="margin-top:20px; padding:10px 20px; font-size:1.2rem;">Import Story JSON</button>
-        `;
-        document.body.appendChild(overlay);
+            <div style="display: flex; gap: 10px; justify-content: center; margin-top:20px;">
+                <button id="main-import-btn" class="choice-btn">Import File</button>
+            </div>
+        </div>
+    `;
 
-        document.getElementById('overlay-import-btn').onclick = () => {
+    // Bind events
+    const importBtn = document.getElementById('main-import-btn');
+    if (importBtn) {
+        importBtn.onclick = () => {
             document.getElementById('import-story-input').click();
         };
     }
+        
+    // Reset stats to indicate no story
+    playerNameElement.innerText = "Player";
+    locationElement.innerText = "-";
+    timeElement.innerText = "--:--";
 }
 
 function startGame() {
