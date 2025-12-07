@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Based RPG Player</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h1>Text Based RPG Player</h1>
+                <div id="info-bar" style="display: flex; align-items: center; gap: 15px;">
+                    <span style="color: #666; font-size: 0.9rem;">dectronics.cc</span>
+                    <button id="import-btn" class="choice-btn" style="padding: 5px 15px; font-size: 0.8rem;" onclick="document.getElementById('import-story-input').click()">Import Story</button>
+                    <input type="file" id="import-story-input" style="display: none;" accept=".json">
+                    <a href="editor.html" class="choice-btn" style="text-decoration: none; padding: 5px 15px; font-size: 0.8rem; display: inline-block;">Open Editor</a>
+                    <button id="about-btn" class="choice-btn" style="padding: 5px 15px; font-size: 0.8rem;">About</button>
+                </div>
+            </div>
+            <div id="stats-bar">
+                <div class="stat-item">👤 <span id="player-name">Name</span></div>
+                <div class="stat-item">📍 <span id="location">Location</span></div>
+                <div class="stat-item">🕒 <span id="time">Mon 08:00</span></div>
+            </div>
+        </header>
+
+        <main id="game-container">
+            <div id="scene-image-container" class="hidden">
+                <img id="scene-image" src="" alt="Scene Image">
+            </div>
+
+            <div id="story-text" class="story-text">
+                <!-- Story text goes here -->
+            </div>
+
+            <div id="input-area" class="hidden">
+                <input type="text" id="player-input" placeholder="Type your answer...">
+                <button id="confirm-input-btn" class="choice-btn">Confirm</button>
+            </div>
+
+            <div id="choices" class="choices-container">
+                <!-- Buttons go here -->
+            </div>
+        </main>
+
+        <footer>
+            <div id="persistent-inventory">
+                <strong>🎒 Inventory:</strong>
+                <span id="inventory-list" class="inv-display">- Empty -</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- About Modal -->
+    <div id="about-modal" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9000; justify-content:center; align-items:center;">
+        <div style="background:#252525; padding:30px; border:1px solid #444; border-radius:8px; width:400px; max-width:90%;">
+            <h2 style="margin-top:0; color:#4caf50;">About Text Based RPG Player</h2>
+            <p>A web-based engine for playing and creating choice-based survival stories.</p>
+            <p>Created by Jules & Tiebe.</p>
+            <div style="margin-top:20px;">
+                <a href="https://github.com/TiebeDeclercq/Text-Based-RPG-Player-Editor" target="_blank" style="color:#2196f3; text-decoration:none; margin-right:15px;">GitHub Repository</a>
+                <a href="https://tiebedeclercq.be/projects/view.php?id=Text+Based+RPG+Player+Editor" target="_blank" style="color:#2196f3; text-decoration:none;">Documentation</a>
+            </div>
+            <button id="close-about-btn" class="choice-btn" style="margin-top:20px; width:100%;">Close</button>
+        </div>
+    </div>
+
+    <script src="schedule.js"></script>
+    <script src="story_data.js"></script>
+    <script src="script.js"></script>
+    <script>
+        // About Modal Logic
+        const aboutBtn = document.getElementById('about-btn');
+        const aboutModal = document.getElementById('about-modal');
+        const closeAboutBtn = document.getElementById('close-about-btn');
+
+        aboutBtn.addEventListener('click', () => {
+            aboutModal.classList.remove('hidden');
+            aboutModal.style.display = 'flex';
+        });
+
+        closeAboutBtn.addEventListener('click', () => {
+            aboutModal.classList.add('hidden');
+            aboutModal.style.display = 'none';
+        });
+
+        aboutModal.addEventListener('click', (e) => {
+            if (e.target === aboutModal) {
+                aboutModal.classList.add('hidden');
+                aboutModal.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

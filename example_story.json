@@ -1,0 +1,385 @@
+{
+  "title": "The Vault of Shadows",
+  "startNode": "intro",
+  "nodes": {
+    "intro": {
+      "id": "intro",
+      "type": "input",
+      "text": "The year is 2087. Neo-Tokyo sprawls beneath neon skies.\n\nYou are a freelance hacker known only by your handle.\n\nWhat do they call you?",
+      "variable": "playerName",
+      "next": "apartment",
+      "location": "Character Creation",
+      "timeSet": 1320,
+      "_editor": { "x": 100, "y": 100 }
+    },
+    "apartment": {
+      "id": "apartment",
+      "type": "choice",
+      "text": "Welcome back, {player}.\n\nYour cramped apartment overlooks the megacity. A message blinks on your terminal:\n\n<b>'URGENT: High-paying gig. Meet at the Red Dragon Bar. -M'</b>\n\nYou recognize M's signature. This could be big.",
+      "location": "Your Apartment - Level 47",
+      "image": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=800",
+      "choices": [
+        {
+          "text": "Grab your gear and head to the bar",
+          "next": "red_dragon_bar",
+          "effects": [
+            { "type": "ADD_ITEM", "item": "Cyberdeck" },
+            { "type": "ADD_ITEM", "item": "Encrypted Comm" }
+          ]
+        },
+        {
+          "text": "Check the darknet for intel first",
+          "next": "darknet_check",
+          "effects": [
+            { "type": "SET_FLAG", "flag": "cautious_hacker", "value": true }
+          ]
+        },
+        {
+          "text": "Ignore it and sleep",
+          "next": "missed_opportunity"
+        }
+      ],
+      "_editor": { "x": 400, "y": 100 }
+    },
+    "darknet_check": {
+      "id": "darknet_check",
+      "type": "choice",
+      "text": "You boot up your terminal and dive into the darknet.\n\nChatter suggests M is working on something involving MegaCorp's downtown vault. High security. High reward.\n\nYou also find a vendor selling EMP grenades.",
+      "location": "Your Apartment - Darknet",
+      "timeSet": 1350,
+      "choices": [
+        {
+          "text": "Buy an EMP grenade (500 credits)",
+          "next": "red_dragon_bar",
+          "effects": [
+            { "type": "ADD_ITEM", "item": "EMP Grenade" },
+            { "type": "ADD_ITEM", "item": "Cyberdeck" }
+          ]
+        },
+        {
+          "text": "Save your credits and leave",
+          "next": "red_dragon_bar",
+          "effects": [
+            { "type": "ADD_ITEM", "item": "Cyberdeck" }
+          ]
+        }
+      ],
+      "_editor": { "x": 400, "y": 300 }
+    },
+    "red_dragon_bar": {
+      "id": "red_dragon_bar",
+      "type": "choice",
+      "text": "The Red Dragon Bar reeks of synth-whiskey and burnt electronics.\n\nM sits in a corner booth, hood up. You approach.\n\n<b>M:</b> '{player}. Good. We're hitting MegaCorp's vault tonight. You in?'",
+      "location": "Red Dragon Bar - Lower District",
+      "timeSet": 1380,
+      "choices": [
+        {
+          "text": "I'm in. What's the plan?",
+          "next": "plan_briefing"
+        },
+        {
+          "text": "What's the payout?",
+          "next": "negotiate_payment"
+        },
+        {
+          "text": "This sounds too risky. I'm out.",
+          "next": "walk_away"
+        }
+      ],
+      "_editor": { "x": 700, "y": 200 }
+    },
+    "negotiate_payment": {
+      "id": "negotiate_payment",
+      "type": "choice",
+      "text": "<b>M:</b> 'Two million credits. Split three ways. You, me, and our demo expert.'\n\nYou lean back. 'Make it 40% for me.'\n\nM pauses, then nods. 'Deal. But you better be worth it.'",
+      "location": "Red Dragon Bar",
+      "choices": [
+        {
+          "text": "Agreed. Let's talk plan.",
+          "next": "plan_briefing",
+          "effects": [
+            { "type": "SET_FLAG", "flag": "negotiated_pay", "value": true }
+          ]
+        }
+      ],
+      "_editor": { "x": 1000, "y": 100 }
+    },
+    "plan_briefing": {
+      "id": "plan_briefing",
+      "type": "choice",
+      "text": "<b>M:</b> 'The vault is in MegaCorp Tower. 80th floor. We go in through the ventilation system.'\n\n'Your job: hack the security grid. Our demo guy handles the physical locks. I'll watch for guards.'\n\nYou check your gear.",
+      "location": "Red Dragon Bar",
+      "timeSet": 1400,
+      "choices": [
+        {
+          "text": "Let's do this tonight",
+          "next": "vault_approach"
+        },
+        {
+          "text": "I need to prepare more",
+          "next": "prep_phase"
+        }
+      ],
+      "_editor": { "x": 1300, "y": 200 }
+    },
+    "prep_phase": {
+      "id": "prep_phase",
+      "type": "choice",
+      "text": "You spend the next few hours modding your cyberdeck and reviewing building schematics.\n\nYou also grab a stealth cloak from your stash.",
+      "location": "Your Apartment",
+      "timeSet": 1440,
+      "choices": [
+        {
+          "text": "Ready. Head to the tower.",
+          "next": "vault_approach",
+          "effects": [
+            { "type": "ADD_ITEM", "item": "Stealth Cloak" }
+          ]
+        }
+      ],
+      "_editor": { "x": 1300, "y": 400 }
+    },
+    "vault_approach": {
+      "id": "vault_approach",
+      "type": "choice",
+      "text": "MegaCorp Tower looms ahead, a monolith of steel and glass.\n\nYou slip into the service entrance. The ventilation shaft is ahead.\n\nSuddenly: footsteps. A guard patrol.",
+      "location": "MegaCorp Tower - Ground Level",
+      "timeSet": 60,
+      "choices": [
+        {
+          "text": "Use stealth cloak",
+          "next": "stealth_success",
+          "condition": { "type": "HAS_ITEM", "item": "Stealth Cloak" }
+        },
+        {
+          "text": "Hack the security camera",
+          "next": "camera_hack"
+        },
+        {
+          "text": "Fight the guards",
+          "next": "combat_guards"
+        }
+      ],
+      "_editor": { "x": 1600, "y": 300 }
+    },
+    "stealth_success": {
+      "id": "stealth_success",
+      "type": "choice",
+      "text": "You activate the cloak. The guards walk right past you.\n\nYou slip into the vent and begin climbing.",
+      "location": "MegaCorp Tower - Vents",
+      "timeSet": 90,
+      "choices": [
+        {
+          "text": "Continue to 80th floor",
+          "next": "vault_door"
+        }
+      ],
+      "_editor": { "x": 1900, "y": 200 }
+    },
+    "camera_hack": {
+      "id": "camera_hack",
+      "type": "logic",
+      "condition": { "type": "HAS_FLAG", "flag": "cautious_hacker", "value": true },
+      "nextTrue": "hack_success",
+      "nextFalse": "hack_fail",
+      "_editor": { "x": 1900, "y": 350 }
+    },
+    "hack_success": {
+      "id": "hack_success",
+      "type": "choice",
+      "text": "Your darknet research pays off. You breach the camera network in seconds.\n\nThe guards see nothing. You proceed.",
+      "location": "MegaCorp Tower - Vents",
+      "choices": [
+        {
+          "text": "Climb to the vault",
+          "next": "vault_door"
+        }
+      ],
+      "_editor": { "x": 2200, "y": 300 }
+    },
+    "hack_fail": {
+      "id": "hack_fail",
+      "type": "choice",
+      "text": "Your hack triggers an alarm. Red lights flash.\n\nM's voice crackles in your ear: 'Abort! Get out!'",
+      "location": "MegaCorp Tower",
+      "choices": [
+        {
+          "text": "Run for it",
+          "next": "escape_fail"
+        },
+        {
+          "text": "Use EMP grenade",
+          "next": "emp_save",
+          "condition": { "type": "HAS_ITEM", "item": "EMP Grenade" }
+        }
+      ],
+      "_editor": { "x": 2200, "y": 450 }
+    },
+    "emp_save": {
+      "id": "emp_save",
+      "type": "choice",
+      "text": "You toss the EMP grenade. Electronics fry. Darkness.\n\nYou scramble into the vents before backup arrives.",
+      "location": "MegaCorp Tower - Emergency Power",
+      "choices": [
+        {
+          "text": "Continue to vault",
+          "next": "vault_door",
+          "effects": [
+            { "type": "REMOVE_ITEM", "item": "EMP Grenade" }
+          ]
+        }
+      ],
+      "_editor": { "x": 2500, "y": 500 }
+    },
+    "vault_door": {
+      "id": "vault_door",
+      "type": "choice",
+      "text": "80th floor. The vault door stands before you - a masterpiece of security engineering.\n\nM and the demo expert are already here.\n\n<b>M:</b> 'Your turn, {player}. Crack it.'",
+      "location": "MegaCorp Tower - Floor 80 - Vault Entrance",
+      "timeSet": 120,
+      "choices": [
+        {
+          "text": "Hack the vault security",
+          "next": "vault_hack"
+        }
+      ],
+      "_editor": { "x": 2200, "y": 100 }
+    },
+    "vault_hack": {
+      "id": "vault_hack",
+      "type": "choice",
+      "text": "You jack into the vault's system. Code streams past your vision.\n\nThe lock mechanism has three layers. You're through two...\n\nLayer three: military-grade ICE. This could fry your brain.",
+      "location": "Vault System - Cyberspace",
+      "choices": [
+        {
+          "text": "Push through the ICE",
+          "next": "ice_challenge"
+        },
+        {
+          "text": "Let the demo expert blow it",
+          "next": "explosive_entry"
+        }
+      ],
+      "_editor": { "x": 2500, "y": 100 }
+    },
+    "ice_challenge": {
+      "id": "ice_challenge",
+      "type": "logic",
+      "condition": { 
+        "type": "AND",
+        "conditions": [
+          { "type": "HAS_ITEM", "item": "Cyberdeck" },
+          { "type": "HAS_FLAG", "flag": "cautious_hacker", "value": true }
+        ]
+      },
+      "nextTrue": "vault_open",
+      "nextFalse": "ice_death",
+      "_editor": { "x": 2800, "y": 50 }
+    },
+    "vault_open": {
+      "id": "vault_open",
+      "type": "choice",
+      "text": "The ICE shatters. The vault door hisses open.\n\nInside: rows of data servers and a single briefcase.\n\nM grabs it. 'Jackpot. Let's move!'",
+      "location": "The Vault",
+      "choices": [
+        {
+          "text": "Escape through the roof",
+          "next": "ending_success"
+        },
+        {
+          "text": "Copy the server data first",
+          "next": "data_theft"
+        }
+      ],
+      "_editor": { "x": 3100, "y": 100 }
+    },
+    "data_theft": {
+      "id": "data_theft",
+      "type": "choice",
+      "text": "You upload the data. Corporate secrets. Blackmail material. This could be worth millions more.\n\nBut sirens wail. Security incoming.",
+      "location": "The Vault",
+      "choices": [
+        {
+          "text": "Run now!",
+          "next": "ending_success",
+          "effects": [
+            { "type": "SET_FLAG", "flag": "stole_data", "value": true }
+          ]
+        }
+      ],
+      "_editor": { "x": 3400, "y": 200 }
+    },
+    "ending_success": {
+      "id": "ending_success",
+      "type": "win",
+      "winMessage": "You escape into the neon night. The briefcase contains 10 million in untraceable credits.\n\nM splits the take. {player}, you're rich.\n\nBut in Neo-Tokyo, there's always another job...\n\n<b>MISSION COMPLETE</b>",
+      "_editor": { "x": 3700, "y": 150 }
+    },
+    "ice_death": {
+      "id": "ice_death",
+      "type": "death",
+      "deathMessage": "The ICE counterattacks. Your nervous system overloads.\n\nYou convulse, then go still.\n\nM drags your body out, but the job is blown.\n\n<b>FLATLINED</b>",
+      "_editor": { "x": 2800, "y": 200 }
+    },
+    "explosive_entry": {
+      "id": "explosive_entry",
+      "type": "choice",
+      "text": "The demo expert plants charges. <b>BOOM!</b>\n\nThe vault door blasts open, but half the floor collapses.\n\nM is hit by debris.",
+      "location": "The Vault - Damaged",
+      "choices": [
+        {
+          "text": "Save M",
+          "next": "save_m"
+        },
+        {
+          "text": "Grab the briefcase and run",
+          "next": "betray_m"
+        }
+      ],
+      "_editor": { "x": 2500, "y": 300 }
+    },
+    "save_m": {
+      "id": "save_m",
+      "type": "choice",
+      "text": "You pull M free. 'Thanks, {player}.'\n\nYou both grab the briefcase and escape via the emergency stairs.",
+      "location": "Emergency Stairwell",
+      "choices": [
+        {
+          "text": "Escape together",
+          "next": "ending_success"
+        }
+      ],
+      "_editor": { "x": 2800, "y": 350 }
+    },
+    "betray_m": {
+      "id": "betray_m",
+      "type": "death",
+      "deathMessage": "You leave M behind and grab the case.\n\nBut the exit is blocked. Security has you cornered.\n\nWithout M's help, you don't make it out.\n\n<b>ELIMINATED</b>",
+      "_editor": { "x": 2800, "y": 450 }
+    },
+    "combat_guards": {
+      "id": "combat_guards",
+      "type": "death",
+      "deathMessage": "You attack the guards. They're trained and armed.\n\nYou're not.\n\nIt's over in seconds.\n\n<b>NEUTRALIZED</b>",
+      "_editor": { "x": 1900, "y": 500 }
+    },
+    "escape_fail": {
+      "id": "escape_fail",
+      "type": "death",
+      "deathMessage": "You run, but the tower lockdown seals every exit.\n\nSecurity swarms in.\n\n<b>CAPTURED</b>",
+      "_editor": { "x": 2500, "y": 600 }
+    },
+    "walk_away": {
+      "id": "walk_away",
+      "type": "death",
+      "deathMessage": "You walk away from the job.\n\nTwo days later, M is found dead. The job went bad.\n\nYou survive, but you'll always wonder: what if?\n\n<b>MISSED OPPORTUNITY</b>",
+      "_editor": { "x": 700, "y": 400 }
+    },
+    "missed_opportunity": {
+      "id": "missed_opportunity",
+      "type": "death",
+      "deathMessage": "You ignore M's message and sleep.\n\nThe next morning, news reports a failed heist at MegaCorp Tower.\n\nM is dead. You missed your shot at the big time.\n\n<b>GAME OVER</b>",
+      "_editor": { "x": 400, "y": 400 }
+    }
+  }
+}

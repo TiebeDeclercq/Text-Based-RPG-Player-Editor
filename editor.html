@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Survival Vives Story Editor</title>
+    <style>
+        :root {
+            --bg-color: #1e1e1e;
+            --node-bg: #2d2d2d;
+            --text-color: #e0e0e0;
+            --accent-color: #4caf50;
+            --line-color: #666;
+            --grid-color: #333;
+        }
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            height: 100vh;
+        }
+
+        /* CANVAS AREA */
+        #editor-canvas {
+            flex-grow: 1;
+            position: relative;
+            overflow: hidden;
+            background-image: radial-gradient(var(--grid-color) 1px, transparent 1px);
+            background-size: 20px 20px;
+            cursor: grab;
+        }
+
+        #editor-canvas:active {
+            cursor: grabbing;
+        }
+
+        /* NODES LAYER */
+        #nodes-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Let clicks pass through empty space */
+            transform-origin: 0 0; /* Crucial for matching SVG transform origin */
+        }
+
+        /* NODES */
+        .node {
+            pointer-events: auto; /* Re-enable clicks on nodes */
+            position: absolute;
+            width: 200px;
+            background-color: var(--node-bg);
+            border: 1px solid #444;
+            border-radius: 5px;
+            padding: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            user-select: none;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .node.selected {
+            border: 2px solid var(--accent-color);
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+        }
+
+        .node.logic {
+            border: 1px solid #9c27b0;
+            background-color: #2a0e35;
+        }
+        .node.logic.selected {
+            border: 2px solid #e040fb;
+            box-shadow: 0 0 10px rgba(224, 64, 251, 0.5);
+        }
+
+        .node.death {
+            border: 1px solid #d32f2f;
+            background-color: #370c0c;
+        }
+        .node.death.selected {
+            border: 2px solid #ff5252;
+            box-shadow: 0 0 10px rgba(255, 82, 82, 0.5);
+        }
+
+        .node.win {
+            border: 1px solid #388e3c;
+            background-color: #0c350e;
+        }
+        .node.win.selected {
+            border: 2px solid #4caf50;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+        }
+
+        /* INSPECTION STYLES */
+        .node.error {
+            box-shadow: 0 0 15px rgba(244, 67, 54, 0.8) !important;
+            border: 2px solid #f44336 !important;
+        }
+
+        .node.warning {
+            box-shadow: 0 0 15px rgba(255, 152, 0, 0.8) !important;
+            border: 2px solid #ff9800 !important;
+        }
+
+        .node-header {
+            font-weight: bold;
+            margin-bottom: 5px;
+            border-bottom: 1px solid #444;
+            padding-bottom: 5px;
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .node-preview {
+            font-size: 0.8rem;
+            color: #aaa;
+            max-height: 40px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* CONNECTIONS (SVG) */
+        #connections-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        /* SIDEBAR */
+        #sidebar {
+            width: 350px;
+            background-color: #252525;
+            border-left: 1px solid #444;
+            display: flex;
+            flex-direction: column;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.5);
+            z-index: 20;
+        }
+
+        #sidebar-header {
+            padding: 15px;
+            background-color: #333;
+            border-bottom: 1px solid #444;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #sidebar-content {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+
+        input[type="text"], textarea, select {
+            width: 100%;
+            background-color: #1e1e1e;
+            border: 1px solid #444;
+            color: white;
+            padding: 8px;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        button {
+            background-color: #444;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background-color: #555;
+        }
+
+        button.primary {
+            background-color: var(--accent-color);
+        }
+
+        button.danger {
+            background-color: #d32f2f;
+        }
+
+        .list-item {
+            background: #333;
+            padding: 10px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            border: 1px solid #444;
+        }
+
+        .list-item-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        /* LOGIC BUILDER UI */
+        .logic-block {
+            background: #2a2a2a;
+            border-left: 3px solid #4caf50;
+            padding: 5px;
+            margin-top: 5px;
+            font-size: 0.9rem;
+        }
+
+        .condition-block {
+            border-left-color: #ff9800;
+        }
+
+        .btn-sm {
+            padding: 2px 5px;
+            font-size: 0.8rem;
+        }
+
+        #toolbar {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 30;
+            background: #252525;
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #444;
+            display: flex;
+            gap: 10px;
+        }
+
+        /* PALETTE (Draggable Window) */
+        #palette-window {
+            position: absolute;
+            top: 60px;
+            left: 10px;
+            width: 150px;
+            background-color: #252525;
+            border: 1px solid #444;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+            z-index: 25;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .palette-header {
+            padding: 8px;
+            background-color: #333;
+            border-bottom: 1px solid #444;
+            font-weight: bold;
+            font-size: 0.9rem;
+            cursor: move; /* Indicate draggable */
+        }
+
+        .palette-item {
+            padding: 10px;
+            border-bottom: 1px solid #333;
+            cursor: grab;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.2s;
+        }
+
+        .palette-item:hover {
+            background-color: #333;
+        }
+
+        .palette-item:active {
+            cursor: grabbing;
+        }
+
+        .palette-icon {
+            width: 20px;
+            height: 20px;
+            background: #4caf50;
+            border-radius: 3px;
+        }
+
+        /* NODE PORTS */
+        .node-port, .node-port-in, .node-port-true, .node-port-false {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 12px;
+            height: 12px;
+            background-color: #888;
+            border: 2px solid #444;
+            border-radius: 50%;
+            cursor: crosshair;
+            z-index: 15;
+            transition: background 0.2s, transform 0.2s;
+        }
+
+        .node-port { right: -10px; }
+        .node-port-in { left: -10px; background-color: #666; }
+
+        /* Logic Node Ports */
+        .node-port-true {
+            right: -10px;
+            top: 30%;
+            background-color: #4caf50;
+        }
+        .node-port-false {
+            right: -10px;
+            top: 70%;
+            background-color: #f44336;
+        }
+
+        .node-port:hover, .node-port-in:hover, .node-port-true:hover, .node-port-false:hover {
+            background-color: #ffeb3b;
+            transform: translateY(-50%) scale(1.3);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TOOLBAR -->
+    <div id="toolbar">
+        <button onclick="editor.newStory()">New Story</button>
+        <span style="border-right: 1px solid #444; margin: 0 5px;"></span>
+        <button onclick="editor.undo()" title="Undo (Ctrl+Z)">Undo</button>
+        <button onclick="editor.redo()" title="Redo (Ctrl+Y)">Redo</button>
+        <span style="border-right: 1px solid #444; margin: 0 5px;"></span>
+        <button onclick="editor.downloadJSON()">Export JSON</button>
+        <button onclick="editor.triggerImport()">Import JSON</button>
+        <input type="file" id="file-input" style="display: none" onchange="editor.importJSON(this)">
+        <span style="border-right: 1px solid #444; margin: 0 5px;"></span>
+        <button onclick="editor.validateStory()">Inspect</button>
+        <button onclick="document.getElementById('settings-modal').style.display='block'">Settings</button>
+    </div>
+
+    <!-- SETTINGS MODAL -->
+    <div id="settings-modal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:#252525; border:1px solid #444; padding:20px; z-index:100; box-shadow:0 0 20px rgba(0,0,0,0.5); min-width:300px;">
+        <h3 style="margin-top:0;">Shortcuts</h3>
+        <ul style="list-style:none; padding:0; line-height:1.6;">
+            <li><b>Ctrl + C</b> : Copy Node</li>
+            <li><b>Ctrl + V</b> : Paste Node</li>
+            <li><b>Ctrl + Z</b> : Undo</li>
+            <li><b>Ctrl + Y</b> : Redo</li>
+            <li><b>Delete / Backspace</b> : Delete Selected Node</li>
+            <li><b>Drag from Port</b> : Connect Node</li>
+        </ul>
+        <button onclick="document.getElementById('settings-modal').style.display='none'" style="margin-top:10px; width:100%;">Close</button>
+    </div>
+
+    <!-- NODE PALETTE -->
+    <div id="palette-window">
+        <div class="palette-header">Tools</div>
+        <div class="palette-item" draggable="true" ondragstart="editor.handleDragStart(event, 'choice')">
+            <div class="palette-icon" style="background:#4caf50"></div>
+            <span>Story Node</span>
+        </div>
+        <div class="palette-item" draggable="true" ondragstart="editor.handleDragStart(event, 'input')">
+            <div class="palette-icon" style="background:#2196f3"></div>
+            <span>Input Node</span>
+        </div>
+        <div class="palette-item" draggable="true" ondragstart="editor.handleDragStart(event, 'logic')">
+            <div class="palette-icon" style="background:#9c27b0"></div>
+            <span>Logic Node</span>
+        </div>
+        <div class="palette-item" draggable="true" ondragstart="editor.handleDragStart(event, 'death')">
+            <div class="palette-icon" style="background:#f44336"></div>
+            <span>Death Node</span>
+        </div>
+        <div class="palette-item" draggable="true" ondragstart="editor.handleDragStart(event, 'win')">
+            <div class="palette-icon" style="background:#4caf50"></div>
+            <span>Win Node</span>
+        </div>
+    </div>
+
+    <!-- CANVAS -->
+    <div id="editor-canvas"
+         onmousedown="editor.canvasMouseDown(event)"
+         onwheel="editor.canvasWheel(event)"
+         ondragover="editor.handleDragOver(event)"
+         ondrop="editor.handleDrop(event)">
+        <svg id="connections-layer"></svg>
+        <div id="nodes-layer">
+            <!-- Nodes injected here -->
+        </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div id="sidebar">
+        <div id="sidebar-header">
+            <span id="sidebar-title">No Selection</span>
+            <button class="danger btn-sm" id="delete-node-btn" style="display:none;" onclick="editor.deleteCurrentNode()">Delete</button>
+        </div>
+        <div id="sidebar-content">
+            <p style="color:#666; text-align:center; margin-top:50px;">Select a node to edit</p>
+        </div>
+    </div>
+
+    <script src="editor.js"></script>
+</body>
+</html>
