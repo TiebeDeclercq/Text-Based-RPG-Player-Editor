@@ -1253,7 +1253,7 @@ class StoryEditor {
             }
             else if (eff.type === 'SET_VALUE') {
                 const propSel = document.createElement('select');
-                ['timeMinutes', 'dayIndex', 'playerName', 'major'].forEach(p => {
+                ['timeMinutes', 'dayIndex', 'playerName'].forEach(p => {
                     const opt = document.createElement('option');
                     opt.value = p; opt.innerText = p;
                     if (eff.property === p) opt.selected = true;

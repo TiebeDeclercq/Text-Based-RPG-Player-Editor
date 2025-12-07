@@ -180,7 +180,7 @@ Effects are executed when a choice is selected:
     { "type": "REMOVE_ITEM", "item": "Rusty Key" }
 ```
 
-*   **SET_VALUE:** Modify game state properties (timeMinutes, dayIndex, playerName, major)
+*   **SET_VALUE:** Modify game state properties (timeMinutes, dayIndex, playerName)
 ```json
     { "type": "SET_VALUE", "property": "timeMinutes", "value": 720 }
 ```
@@ -240,12 +240,12 @@ Use placeholders in text that get replaced at runtime:
 
 *   `{player}` - Player's name
 *   `{time}` - Current time (HH:MM format)
-*   `{propertyName}` - Any game state property (playerName, major, etc.)
+*   `{propertyName}` - Any game state property (playerName, etc.)
 
 Example:
 ```json
 {
-  "text": "Welcome, {player}! The time is {time}. You are studying {major}."
+  "text": "Welcome, {player}! The time is {time}."
 }
 ```
 

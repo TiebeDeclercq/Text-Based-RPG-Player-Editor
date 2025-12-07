@@ -15,7 +15,7 @@ const inventoryListElement = document.getElementById('inventory-list');
 const persistentInventory = document.getElementById('persistent-inventory');
 
 // Constants
-const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
 // Audio System
 const SoundManager = {
@@ -54,9 +54,8 @@ let gameState = {
     flags: {},
     dayIndex: 0, // 0 = Monday
     timeMinutes: 480, // 08:00
-    playerName: "Nieuwe Student",
+    playerName: "Player",
     characterId: 'custom',
-    major: "ICT_APP" // Default
 };
 
 // Typewriter settings
@@ -111,7 +110,7 @@ function executeEffects(effects) {
                 break;
             case 'SET_VALUE':
                 // Safe property setting (whitelist approach or direct)
-                if (['dayIndex', 'timeMinutes', 'playerName', 'major'].includes(eff.property)) {
+                if (['dayIndex', 'timeMinutes', 'playerName'].includes(eff.property)) {
                     gameState[eff.property] = eff.value;
                 }
                 break;
@@ -510,7 +509,7 @@ function parseText(text) {
     // Replace {time} with formatted time
     parsed = parsed.replace(/{time}/g, getTimeString());
 
-    // Replace {gameStateProperty} (e.g. {major})
+    // Replace {gameStateProperty}
     parsed = parsed.replace(/{(\w+)}/g, (match, propName) => {
         if (gameState.hasOwnProperty(propName)) {
             return gameState[propName];
